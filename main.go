@@ -116,7 +116,9 @@ func NearmapTilesV3OverOpenStreetMap(x, y, z int, tilestype, apikey string, year
 		// This avoids fetching any OpenStreetMap image, so is faster.
 	}
 
-	osm, errOSM := GetImage(OpenStreetMapURL(x, y, z))
+    url2 := OpenStreetMapURL(x, y, z)
+	fmt.Printf("fallback z=%d x=%d y=%d lon,lat=%f %f %s\n", z, x, y, lon, lat, url2)
+	osm, errOSM := GetImage(url2)
 	if errOSM != nil && errNM != nil {
 		return image.NewRGBA(r) // Both images failed, return blank image.
 	} else if errOSM != nil {
