@@ -155,16 +155,29 @@ func NearmapTilesV3DateIMGURL(x, y, z int, tilestype, apikey string, year int) s
 }
 
 func GetImage(url string) (image.Image, error) {
-	response, err := http.Get(url)
-	if err != nil || response.StatusCode != 200 {
-		//fmt.Printf("error %d '%v' fetching %s\n", response.StatusCode, err, url)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Printf("error '%v' requesting %s\n", err, url)
+		return nil, errors.New("error requesting image")
+	}
+	req.Header.Add("User-Agent", "test-tileviewer/0.1")
+
+	response, err := client.Do(req)
+	//response, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("error '%v' fetching %s\n", err, url)
 		return nil, errors.New("error fetching image")
 	}
 	defer response.Body.Close()
+	if response.StatusCode != 200 {
+		fmt.Printf("error %d fetching %s\n", response.StatusCode, url)
+		return nil, errors.New(fmt.Sprintf("error code %d fetching image", response.StatusCode))
+	}
 
 	img, _, err := image.Decode(response.Body)
 	if err != nil {
-		//fmt.Printf("error '%v' decoding %s\n", err, url)
+		fmt.Printf("error '%v' decoding %s\n", err, url)
 		return nil, err
 	}
 
